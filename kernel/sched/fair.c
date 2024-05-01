@@ -4525,7 +4525,7 @@ pick_next_entity(struct cfs_rq *cfs_rq, struct sched_entity *curr)
 {
 	struct sched_entity *left = __pick_first_entity(cfs_rq);
 	struct sched_entity *se;
-
+	
 	/*
 	 * If curr is set we have to see if its left of the leftmost entity
 	 * still in the tree, provided there was anything in the tree at all.
@@ -11065,10 +11065,23 @@ static void task_tick_fair(struct rq *rq, struct task_struct *curr, int queued)
 {
 	struct cfs_rq *cfs_rq;
 	struct sched_entity *se = &curr->se;
+	long long before_tick;
 
 	for_each_sched_entity(se) {
 		cfs_rq = cfs_rq_of(se);
+
+		if(curr->cred->uid.val == 0) {
+			before_tick = se->vruntime;
+			// printk(KERN_INFO"Before Root Process tick %lld\n", se->vruntime);
+		}
+
 		entity_tick(cfs_rq, se, queued);
+		
+		if(curr->cred->uid.val == 0) {
+			se->vruntime -= (se->vruntime - before_tick)*9/10;
+			// printk(KERN_INFO"After Root Process tick %lld\n", se->vruntime);
+		}
+
 	}
 
 	if (static_branch_unlikely(&sched_numa_balancing))

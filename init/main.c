@@ -1141,6 +1141,8 @@ asmlinkage __visible void __init __no_sanitize_address start_kernel(void)
 	/* Do the rest non-__init'ed, we're now alive */
 	arch_call_rest_init();
 
+	printk(KERN_INFO"Linux toy kernel by noru\n");
+
 	prevent_tail_call_optimization();
 }
 
